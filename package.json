@@ -1,0 +1,56 @@
+{
+  "name": "@raulanatol/trakt-cli",
+  "version": "0.1.0",
+  "description": "CLI for Trakt.tv — designed to be consumed by Claude skills (JSON output).",
+  "type": "module",
+  "license": "MIT",
+  "author": "Raul Anatol",
+  "homepage": "https://github.com/raulanatol/trakt-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raulanatol/trakt-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raulanatol/trakt-cli/issues"
+  },
+  "keywords": [
+    "trakt",
+    "trakt-tv",
+    "cli",
+    "claude",
+    "claude-skill",
+    "tv-shows",
+    "movies"
+  ],
+  "bin": {
+    "trakt-cli": "./dist/index.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm clean && pnpm build"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "typescript": "^5.6.0"
+  }
+}
