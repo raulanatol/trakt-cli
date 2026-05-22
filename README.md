@@ -16,17 +16,18 @@ The global bin is `trakt-cli`.
 
 1. Create an app at https://trakt.tv/oauth/applications
    - Redirect URI: `urn:ietf:wg:oauth:2.0:oob`
-2. Export your credentials:
+2. Export your credentials **only for the login step**:
    ```sh
    export TRAKT_CLIENT_ID=...
    export TRAKT_CLIENT_SECRET=...
-   ```
-3. Authenticate:
-   ```sh
    trakt-cli login       # device flow — follow on-screen instructions
    ```
 
-Tokens are stored at `~/.config/trakt-cli/auth.json` with mode `0600`.
+After `login`, the credentials are persisted in `~/.config/trakt-cli/auth.json` (mode `0600`) alongside the OAuth tokens, so you can `unset` the env vars. The CLI will refresh tokens transparently when they expire without needing them again.
+
+### Upgrading from 1.0.x
+
+`1.0.0` required the env vars on every command. If you upgraded an existing install, run `trakt-cli logout && trakt-cli login` once (with env vars set) to migrate your session to the new format.
 
 ### Local development
 

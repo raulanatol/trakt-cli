@@ -8,7 +8,12 @@ export const TRAKT_USER_AGENT = 'trakt-cli/0.1.0 (+https://github.com/raulanatol
 export const CONFIG_DIR = join(homedir(), '.config', 'trakt-cli');
 export const AUTH_FILE = join(CONFIG_DIR, 'auth.json');
 
-export function getCredentials(): { clientId: string; clientSecret: string } {
+export interface Credentials {
+  clientId: string;
+  clientSecret: string;
+}
+
+export function getEnvCredentials(): Credentials {
   const clientId = process.env.TRAKT_CLIENT_ID;
   const clientSecret = process.env.TRAKT_CLIENT_SECRET;
   if (!clientId || !clientSecret) {

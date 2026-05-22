@@ -8,6 +8,8 @@ export interface StoredToken {
   expires_at: number; // unix seconds
   scope: string;
   token_type: string;
+  client_id: string;
+  client_secret: string;
 }
 
 export async function readToken(): Promise<StoredToken | null> {
