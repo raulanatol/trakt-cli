@@ -1,4 +1,4 @@
-import { TRAKT_API_BASE, TRAKT_USER_AGENT, getCredentials } from '../config.js';
+import { TRAKT_API_BASE, TRAKT_USER_AGENT, getEnvCredentials } from '../config.js';
 import { writeToken, type StoredToken } from './token-store.js';
 
 interface DeviceCodeResponse {
@@ -19,7 +19,7 @@ interface TokenResponse {
 }
 
 export async function requestDeviceCode(): Promise<DeviceCodeResponse> {
-  const { clientId } = getCredentials();
+  const { clientId } = getEnvCredentials();
   const res = await fetch(`${TRAKT_API_BASE}/oauth/device/code`, {
     method: 'POST',
     headers: oauthHeaders(),
@@ -32,7 +32,7 @@ export async function requestDeviceCode(): Promise<DeviceCodeResponse> {
 }
 
 export async function pollForToken(device: DeviceCodeResponse): Promise<StoredToken> {
-  const { clientId, clientSecret } = getCredentials();
+  const { clientId, clientSecret } = getEnvCredentials();
   const deadline = Date.now() + device.expires_in * 1000;
   let intervalMs = device.interval * 1000;
 
@@ -56,6 +56,8 @@ export async function pollForToken(device: DeviceCodeResponse): Promise<StoredTo
         expires_at: data.created_at + data.expires_in,
         scope: data.scope,
         token_type: data.token_type,
+        client_id: clientId,
+        client_secret: clientSecret,
       };
       await writeToken(stored);
       return stored;
@@ -77,15 +79,14 @@ export async function pollForToken(device: DeviceCodeResponse): Promise<StoredTo
   throw new Error('Device code expired before authorization completed.');
 }
 
-export async function refreshAccessToken(refreshToken: string): Promise<StoredToken> {
-  const { clientId, clientSecret } = getCredentials();
+export async function refreshAccessToken(stored: StoredToken): Promise<StoredToken> {
   const res = await fetch(`${TRAKT_API_BASE}/oauth/token`, {
     method: 'POST',
     headers: oauthHeaders(),
     body: JSON.stringify({
-      refresh_token: refreshToken,
-      client_id: clientId,
-      client_secret: clientSecret,
+      refresh_token: stored.refresh_token,
+      client_id: stored.client_id,
+      client_secret: stored.client_secret,
       redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
       grant_type: 'refresh_token',
     }),
@@ -94,15 +95,17 @@ export async function refreshAccessToken(refreshToken: string): Promise<StoredTo
     throw new Error(`Token refresh failed: ${res.status} ${await res.text()}`);
   }
   const data = (await res.json()) as TokenResponse;
-  const stored: StoredToken = {
+  const refreshed: StoredToken = {
     access_token: data.access_token,
     refresh_token: data.refresh_token,
     expires_at: data.created_at + data.expires_in,
     scope: data.scope,
     token_type: data.token_type,
+    client_id: stored.client_id,
+    client_secret: stored.client_secret,
   };
-  await writeToken(stored);
-  return stored;
+  await writeToken(refreshed);
+  return refreshed;
 }
 
 function oauthHeaders(): Record<string, string> {
