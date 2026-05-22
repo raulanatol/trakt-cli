@@ -1,6 +1,6 @@
 {
   "name": "@raulanatol/trakt-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "CLI for Trakt.tv — designed to be consumed by Claude skills (JSON output).",
   "type": "module",
   "license": "MIT",
