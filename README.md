@@ -1,6 +1,8 @@
 # trakt-cli
 
-A CLI for [Trakt.tv](https://trakt.tv) designed to be consumed by Claude skills. All commands emit JSON on stdout; errors go to stderr with non-zero exit codes.
+A friendly command-line tool for [Trakt.tv](https://trakt.tv) — the service that tracks what you watch on TV and in movies, scrobbles from your media players, and keeps your watchlist, history and stats in one place.
+
+`trakt-cli` exposes that data through a clean JSON interface, so you can pipe it into scripts, dashboards, or **AI skills** that need to know what you've been watching. All commands emit JSON on stdout; errors go to stderr with non-zero exit codes.
 
 ## Install
 
@@ -10,24 +12,20 @@ npm i -g @raulanatol/trakt-cli
 pnpm add -g @raulanatol/trakt-cli
 ```
 
-The global bin is `trakt-cli`.
+The global binary is `trakt-cli`.
 
 ## Setup
 
-1. Create an app at https://trakt.tv/oauth/applications
-   - Redirect URI: `urn:ietf:wg:oauth:2.0:oob`
+1. Create an application at https://trakt.tv/oauth/applications
+   - Set the redirect URI to: `urn:ietf:wg:oauth:2.0:oob`
 2. Export your credentials **only for the login step**:
    ```sh
    export TRAKT_CLIENT_ID=...
    export TRAKT_CLIENT_SECRET=...
-   trakt-cli login       # device flow — follow on-screen instructions
+   trakt-cli login       # device flow — just follow the on-screen instructions
    ```
 
-After `login`, the credentials are persisted in `~/.config/trakt-cli/auth.json` (mode `0600`) alongside the OAuth tokens, so you can `unset` the env vars. The CLI will refresh tokens transparently when they expire without needing them again.
-
-### Upgrading from 1.0.x
-
-`1.0.0` required the env vars on every command. If you upgraded an existing install, run `trakt-cli logout && trakt-cli login` once (with env vars set) to migrate your session to the new format.
+That's it. After `login`, your credentials and OAuth tokens are stored together in `~/.config/trakt-cli/auth.json` (mode `0600`), so you can safely `unset` the env vars. The CLI refreshes tokens transparently when they expire — you won't need to log in again.
 
 ### Local development
 
@@ -39,16 +37,16 @@ pnpm link --global
 
 ## Commands
 
-All commands emit JSON. Errors → stderr as `{"error": "..."}` and exit ≠ 0.
+All commands emit JSON on stdout. Errors are written to stderr as `{"error": "..."}` and exit with a non-zero status.
 
 | Command | Description |
 | --- | --- |
-| `trakt-cli login` | OAuth device flow |
+| `trakt-cli login` | Sign in via OAuth device flow |
 | `trakt-cli logout` | Remove stored tokens |
-| `trakt-cli whoami` | Authenticated user info |
-| `trakt-cli history [--type movies\|shows] [--limit N]` | Watch history |
-| `trakt-cli watchlist [--type] [--limit N]` | Watchlist items |
-| `trakt-cli search <query> [--type movie\|show]` | Search |
-| `trakt-cli trending [--type movies\|shows] [--limit N]` | Trending |
-| `trakt-cli recommendations [--type movies\|shows] [--limit N]` | Personal recommendations |
-| `trakt-cli stats` | Your Trakt stats |
+| `trakt-cli whoami` | Show the authenticated user |
+| `trakt-cli history [--type movies\|shows] [--limit N]` | Your watch history |
+| `trakt-cli watchlist [--type] [--limit N]` | Items on your watchlist |
+| `trakt-cli search <query> [--type movie\|show]` | Search Trakt's catalog |
+| `trakt-cli trending [--type movies\|shows] [--limit N]` | What's trending right now |
+| `trakt-cli recommendations [--type movies\|shows] [--limit N]` | Personalized recommendations |
+| `trakt-cli stats` | Your personal Trakt stats |
