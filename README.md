@@ -2,7 +2,7 @@
 
 A friendly command-line tool for [Trakt.tv](https://trakt.tv) — the service that tracks what you watch on TV and in movies, scrobbles from your media players, and keeps your watchlist, history and stats in one place.
 
-`trakt-cli` exposes that data through a clean JSON interface, so you can pipe it into scripts, dashboards, or **AI skills** that need to know what you've been watching. All commands emit JSON on stdout; errors go to stderr with non-zero exit codes.
+`trakt-cli` exposes that data through a clean interface, so you can pipe it into scripts, dashboards, or **AI skills** that need to know what you've been watching. Commands emit JSON where documented; errors go to stderr with non-zero exit codes.
 
 ## Install
 
@@ -50,3 +50,4 @@ All commands emit JSON on stdout. Errors are written to stderr as `{"error": "..
 | `trakt-cli trending [--type movies\|shows] [--limit N]` | What's trending right now |
 | `trakt-cli recommendations [--type movies\|shows] [--limit N]` | Personalized recommendations |
 | `trakt-cli stats` | Your personal Trakt stats |
+| `trakt-cli episodes:missing --show <query> [--season N] [--next] [--json]` | Pending episodes for a show (`--json` for automation) |
