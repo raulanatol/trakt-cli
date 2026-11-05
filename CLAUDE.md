@@ -15,14 +15,19 @@ Preserve this contract when adding or changing commands. Never `console.log` non
 ## Commands
 
 ```sh
-npm run build      # tsc → dist/
-npm run dev        # tsc --watch
-npm run clean      # rm -rf dist
-npm link           # exposes `trakt-cli` globally after build
+make help          # list every task
+make build         # tsc → dist/
+make test          # build + node --test test/*.test.js
+make typecheck     # tsc --noEmit
+make link          # exposes `trakt-cli` globally after build
 node dist/index.js <cmd>   # run without linking
 ```
 
-There is no test runner, linter, or formatter configured. If you add one, wire it into `package.json` scripts.
+There is no linter or formatter configured. Tests live in `test/*.test.js` and run against the built `dist/`.
+
+### Releasing
+
+Always release through the Makefile (`make release-patch|minor|major`, or `make release-dry-run` to check guards). Never bump `package.json`, tag, or `npm publish` by hand: the tag push triggers `.github/workflows/release.yml`, which publishes to npm and creates the GitHub Release. Full procedure in the README "Releasing" section.
 
 Required env vars for any command that talks to Trakt: `TRAKT_CLIENT_ID`, `TRAKT_CLIENT_SECRET` (see `src/config.ts:getCredentials`). The CLI throws a clear error if either is missing.
 

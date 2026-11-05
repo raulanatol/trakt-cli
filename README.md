@@ -35,6 +35,30 @@ pnpm build
 pnpm link --global
 ```
 
+Run `make help` to see every available task.
+
+### Releasing
+
+Releases are cut with a single command from an up-to-date `main`:
+
+```sh
+make release-dry-run   # optional: run every guard and list commits since the last tag
+make release-minor     # or release-patch / release-major
+```
+
+Pick the bump with [semver](https://semver.org): `patch` for fixes, `minor` for new commands or options, `major` for breaking changes to the JSON output or CLI flags.
+
+The target refuses to run unless you are on `main`, the working tree is clean, and local `main` matches `origin/main`. It then runs the typecheck and the test suite, bumps `package.json`, creates the `chore(release): X.Y.Z` commit plus the `vX.Y.Z` tag, and pushes both.
+
+Pushing the tag triggers `.github/workflows/release.yml`, which tests, builds, publishes to npm (with provenance) and creates the GitHub Release with auto-generated notes. Follow it with `gh run watch`.
+
+If the workflow fails after the tag is pushed (for example, an expired `NPM_TOKEN` secret), fix the cause, then delete and re-push the tag:
+
+```sh
+git push --delete origin vX.Y.Z && git tag -d vX.Y.Z
+git tag vX.Y.Z && git push origin vX.Y.Z
+```
+
 ## Commands
 
 Commands emit JSON on stdout by default. `episodes:missing` emits readable terminal lines unless `--json` is supplied. Errors are written to stderr as `{"error": "..."}` and exit with a non-zero status.
