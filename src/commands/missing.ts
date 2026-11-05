@@ -31,13 +31,25 @@ export interface MissingOptions {
   json?: boolean;
 }
 
+export interface MissingDependencies {
+  request: typeof request;
+  emit: typeof emit;
+  write: (text: string) => void;
+}
+
+const defaultDependencies: MissingDependencies = {
+  request,
+  emit,
+  write: (text) => process.stdout.write(text),
+};
+
 export function findMissingEpisodes(
   seasons: ProgressSeason[],
   seasonFilter?: number,
 ): MissingEpisode[] {
   return seasons
     .flatMap((season) =>
-      season.number === undefined || !season.episodes
+      season.number === undefined || season.number === 0 || !season.episodes
         ? []
         : season.episodes
             .filter((episode) => episode.number !== undefined && episode.completed !== true)
@@ -52,12 +64,15 @@ export function findMissingEpisodes(
     .sort((left, right) => left.season - right.season || left.number - right.number);
 }
 
-export async function missingEpisodesCommand(opts: MissingOptions): Promise<void> {
+export async function missingEpisodesCommand(
+  opts: MissingOptions,
+  dependencies: MissingDependencies = defaultDependencies,
+): Promise<void> {
   const query = opts.show.trim();
   if (!query) throw new Error('The --show option cannot be empty.');
 
   const season = parseSeason(opts.season);
-  const results = await request<SearchResult[]>('/search/show', {
+  const results = await dependencies.request<SearchResult[]>('/search/show', {
     query: { query, limit: 1, extended: 'full' },
     auth: false,
   });
@@ -65,20 +80,20 @@ export async function missingEpisodesCommand(opts: MissingOptions): Promise<void
   const showId = show?.ids?.trakt ?? show?.ids?.slug;
   if (!show || showId === undefined) throw new Error(`Show not found: ${query}`);
 
-  const progress = await request<{ seasons?: ProgressSeason[] }>(
+  const progress = await dependencies.request<{ seasons?: ProgressSeason[] }>(
     `/shows/${encodeURIComponent(String(showId))}/progress/watched`,
-    { query: { hidden: 'false', specials: 'true' } },
+    { query: { hidden: 'false', specials: 'false' } },
   );
   let missing = findMissingEpisodes(progress.seasons ?? [], season);
   if (opts.next) missing = missing.slice(0, 1);
   if (missing.length === 0) throw new Error('No pending episodes found.');
 
   if (opts.json) {
-    emit(missing);
+    dependencies.emit(missing);
     return;
   }
 
-  process.stdout.write(
+  dependencies.write(
     missing
       .map((episode) => `${episode.season}x${String(episode.number).padStart(2, '0')} ${episode.title}`)
       .join('\n') + '\n',

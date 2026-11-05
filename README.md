@@ -37,7 +37,7 @@ pnpm link --global
 
 ## Commands
 
-All commands emit JSON on stdout. Errors are written to stderr as `{"error": "..."}` and exit with a non-zero status.
+Commands emit JSON on stdout by default. `episodes:missing` emits readable terminal lines unless `--json` is supplied. Errors are written to stderr as `{"error": "..."}` and exit with a non-zero status.
 
 | Command | Description |
 | --- | --- |

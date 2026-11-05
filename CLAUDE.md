@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `trakt-cli` is a Node.js CLI for Trakt.tv designed to be consumed by Claude skills. The contract is strict and machine-oriented:
 
-- **stdout is JSON only** — every successful command emits a single `JSON.stringify(data, null, 2)` blob followed by `\n` (`src/output.ts:emit`).
+- **stdout is JSON by default** — standard commands emit a single `JSON.stringify(data, null, 2)` blob followed by `\n` (`src/output.ts:emit`). The `episodes:missing` command intentionally emits readable terminal lines unless `--json` is supplied.
 - **stderr is for humans and errors** — interactive prompts (e.g. the device-flow URL/code in `src/commands/login.ts`) and JSON error payloads (`{"error": "...", "code": "..."}`) both go to stderr.
 - **Non-zero exit on failure** — `src/output.ts:fail` writes to stderr and `process.exit(1)`.
 
