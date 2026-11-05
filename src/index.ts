@@ -10,6 +10,7 @@ import { searchCommand } from './commands/search.js';
 import { trendingCommand } from './commands/trending.js';
 import { recommendationsCommand } from './commands/recommendations.js';
 import { statsCommand } from './commands/stats.js';
+import { missingEpisodesCommand } from './commands/missing.js';
 
 const program = new Command();
 
@@ -60,6 +61,15 @@ program
   .action(run(recommendationsCommand));
 
 program.command('stats').description('Show your Trakt stats').action(run(statsCommand));
+
+program
+  .command('episodes:missing')
+  .description('Show unwatched episodes for a TV show')
+  .requiredOption('-s, --show <query>', 'show title or search query')
+  .option('--season <n>', 'limit results to a season')
+  .option('--next', 'show only the next pending episode')
+  .option('--json', 'emit stable JSON instead of terminal output')
+  .action(run(missingEpisodesCommand));
 
 program.parseAsync(process.argv).catch((err) => {
   const code = (err as NodeJS.ErrnoException).code;
